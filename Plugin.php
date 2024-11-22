@@ -109,17 +109,21 @@ class CustomRSS_Plugin implements Typecho_Plugin_Interface
                 ->where('name = ?', 'postjj'));
 
             if (!empty($customDesc['str_value'])) {
-                $rssFeed .= '<description><![CDATA[' . htmlspecialchars($customDesc['str_value']) . ']]></description>' . PHP_EOL;
+                $descContent = $Parsedown->text($customDesc['str_value']);
+                $rssFeed .= '<description><![CDATA[' . $descContent . ']]></description>' . PHP_EOL;
             } else {
                 if (!empty($row['text'])) {
-                    $htmlContent = $Parsedown->text($row['text']);
+                    $text = str_replace('<!--markdown-->', '', $row['text']);
+                    $htmlContent = $Parsedown->text($text);
                     $excerpt = mb_substr(strip_tags($htmlContent), 0, 128, 'UTF-8') . '...';
-                    $rssFeed .= '<description><![CDATA[' . $excerpt . ']]></description>' . PHP_EOL;
+                    $excerptHtml = $Parsedown->text($excerpt);
+                    $rssFeed .= '<description><![CDATA[' . $excerptHtml . ']]></description>' . PHP_EOL;
                 }
             }
 
             if (!empty($row['text'])) {
-                $htmlContent = $Parsedown->text($row['text']);
+                $text = str_replace('<!--markdown-->', '', $row['text']);
+                $htmlContent = $Parsedown->text($text);
                 $rssFeed .= '<content:encoded><![CDATA[' . PHP_EOL . $htmlContent . PHP_EOL . ']]></content:encoded>' . PHP_EOL;
             }
 
